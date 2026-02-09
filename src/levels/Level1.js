@@ -6,7 +6,7 @@ export default class Level1 extends LevelBase {
 
     // Icy Tower tuning
     this.totalFloors = 20;
-    this.floorSpacing = 220;
+    this.floorSpacing = 65;
 
     this.lastFloor = 0;
     this.failGuard = false;
@@ -137,7 +137,7 @@ export default class Level1 extends LevelBase {
     const onGround = this.player.body.blocked.down;
 
     if (jump && onGround) {
-      this.player.setVelocityY(-680);
+      this.player.setVelocityY(-950);
     }
 
     // Parallax brick background

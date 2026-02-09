@@ -97,7 +97,7 @@ export default class HUDScene extends Phaser.Scene {
   }
 
   setupMobileControls() {
-    if (!this.isMobileTouchDevice()) return;
+    
 
     this.ensureTouchRegistry();
 
