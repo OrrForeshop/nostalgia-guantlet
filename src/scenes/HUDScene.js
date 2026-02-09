@@ -70,6 +70,122 @@ export default class HUDScene extends Phaser.Scene {
 
     this.isPaused = false;
     this.refresh();
+
+    this.setupMobileControls();
+
+    // Keep touch controls anchored on resize/orientation change.
+    this.scale.on('resize', () => {
+      this.layoutMobileControls();
+    });
+  }
+
+  isMobileTouchDevice() {
+    const dev = this.sys.game.device;
+    const hasTouch = !!dev?.input?.touch;
+    const isMobileOs = !!(dev?.os?.android || dev?.os?.iOS || dev?.os?.iPad || dev?.os?.iPhone || dev?.os?.windowsPhone);
+
+    return hasTouch && isMobileOs;
+  }
+
+  ensureTouchRegistry() {
+    const existing = this.game.registry.get('touchInput');
+    if (existing) return existing;
+
+    const touch = { left: false, right: false, jump: false, jumpJustPressed: false };
+    this.game.registry.set('touchInput', touch);
+    return touch;
+  }
+
+  setupMobileControls() {
+    if (!this.isMobileTouchDevice()) return;
+
+    this.ensureTouchRegistry();
+
+    this.mobileControls = this.add.container(0, 0).setDepth(1500);
+
+    const makeButton = ({ width, height, label, fontSize = 26 }) => {
+      const root = this.add.container(0, 0);
+
+      const bg = this.add.rectangle(0, 0, width, height, 0x000000, 0.28)
+        .setOrigin(0.5)
+        .setStrokeStyle(2, 0xffffff, 0.18);
+
+      const txt = this.add.text(0, 0, label, {
+        fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
+        fontSize: `${fontSize}px`,
+        fontWeight: '800',
+        color: '#ffffff',
+      }).setOrigin(0.5);
+
+      root.add([bg, txt]);
+
+      // Container itself isn't interactive; use bg for hit area.
+      bg.setInteractive({ useHandCursor: false });
+
+      return { root, bg };
+    };
+
+    // Left/Right arrows (bottom-left)
+    this.btnLeft = makeButton({ width: 72, height: 62, label: '◀', fontSize: 30 });
+    this.btnRight = makeButton({ width: 72, height: 62, label: '▶', fontSize: 30 });
+
+    // Jump (bottom-right)
+    this.btnJump = makeButton({ width: 160, height: 74, label: 'JUMP', fontSize: 28 });
+
+    this.mobileControls.add([this.btnLeft.root, this.btnRight.root, this.btnJump.root]);
+
+    // Wire buttons into shared touchInput registry.
+    const setTouch = (patch) => {
+      const touch = this.ensureTouchRegistry();
+      Object.assign(touch, patch);
+      this.game.registry.set('touchInput', touch);
+    };
+
+    const bindHold = (btnBg, key) => {
+      btnBg.on('pointerdown', () => setTouch({ [key]: true }));
+      btnBg.on('pointerup', () => setTouch({ [key]: false }));
+      btnBg.on('pointerout', () => setTouch({ [key]: false }));
+    };
+
+    bindHold(this.btnLeft.bg, 'left');
+    bindHold(this.btnRight.bg, 'right');
+
+    // Jump: hold state + one-shot "just pressed" for LevelBase.getMoveInput().
+    this.btnJump.bg.on('pointerdown', () => {
+      const touch = this.ensureTouchRegistry();
+      if (!touch.jump) {
+        touch.jumpJustPressed = true;
+      }
+      touch.jump = true;
+      this.game.registry.set('touchInput', touch);
+    });
+    const clearJump = () => {
+      const touch = this.ensureTouchRegistry();
+      touch.jump = false;
+      this.game.registry.set('touchInput', touch);
+    };
+    this.btnJump.bg.on('pointerup', clearJump);
+    this.btnJump.bg.on('pointerout', clearJump);
+
+    this.layoutMobileControls();
+  }
+
+  layoutMobileControls() {
+    if (!this.mobileControls) return;
+
+    const w = this.scale.width;
+    const h = this.scale.height;
+
+    const margin = 18;
+    const gap = 10;
+
+    // bottom-left cluster
+    const leftY = h - margin - 36; // centered-ish
+    this.btnLeft.root.setPosition(margin + 36, leftY);
+    this.btnRight.root.setPosition(margin + 36 + 72 + gap, leftY);
+
+    // bottom-right jump
+    this.btnJump.root.setPosition(w - margin - 80, h - margin - 40);
   }
 
   showPlayAgain() {

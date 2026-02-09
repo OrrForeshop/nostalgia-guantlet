@@ -5,7 +5,7 @@ export default class VerticalClimbBase extends LevelBase {
     super(key);
     this.targetFloors = targetFloors;
 
-    this.floorSpacing = 110;
+    this.floorSpacing = 65; // Even lower platforms (almost half of original)
     this.deathMargin = 28;
 
     this.highestY = null;
@@ -61,7 +61,7 @@ export default class VerticalClimbBase extends LevelBase {
 
     this.physics.add.collider(this.player, this.platforms, () => {
       // Bounce / quick climb helper: hold jump to "spring" on landings.
-      const holdingJump = this.cursors.up.isDown || this.keys.w.isDown || this.keys.space.isDown;
+      const holdingJump = this.isJumpHeld();
       const vy = this.player.body.velocity.y;
       const onGround = this.player.body.blocked.down;
 

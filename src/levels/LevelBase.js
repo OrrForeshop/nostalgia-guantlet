@@ -88,14 +88,33 @@ export default class LevelBase extends Phaser.Scene {
   }
 
   // Helper used by derived classes.
+  // Supports both keyboard and mobile touch controls (wired via HUDScene).
   getMoveInput() {
-    const left = this.cursors.left.isDown || this.keys.a.isDown;
-    const right = this.cursors.right.isDown || this.keys.d.isDown;
-    const jump = Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
+    const touch = this.game.registry.get('touchInput') ?? {};
+
+    const left = this.cursors.left.isDown || this.keys.a.isDown || !!touch.left;
+    const right = this.cursors.right.isDown || this.keys.d.isDown || !!touch.right;
+
+    const jumpKey = Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
       Phaser.Input.Keyboard.JustDown(this.keys.w) ||
       Phaser.Input.Keyboard.JustDown(this.keys.space);
 
+    const jumpTouch = !!touch.jumpJustPressed;
+
+    // Consume one-shot touch jump.
+    if (jumpTouch) {
+      touch.jumpJustPressed = false;
+      this.game.registry.set('touchInput', touch);
+    }
+
+    const jump = jumpKey || jumpTouch;
+
     return { left, right, jump };
+  }
+
+  isJumpHeld() {
+    const touch = this.game.registry.get('touchInput') ?? {};
+    return this.cursors.up.isDown || this.keys.w.isDown || this.keys.space.isDown || !!touch.jump;
   }
 
   winLevel() {
