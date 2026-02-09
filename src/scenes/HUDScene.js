@@ -97,7 +97,7 @@ export default class HUDScene extends Phaser.Scene {
   }
 
   setupMobileControls() {
-    
+    // Force-visible touch controls (accessibility): show on all devices.
 
     this.ensureTouchRegistry();
 
@@ -106,9 +106,9 @@ export default class HUDScene extends Phaser.Scene {
     const makeButton = ({ width, height, label, fontSize = 26 }) => {
       const root = this.add.container(0, 0);
 
-      const bg = this.add.rectangle(0, 0, width, height, 0x000000, 0.28)
+      const bg = this.add.rectangle(0, 0, width, height, 0x000000, 0.62)
         .setOrigin(0.5)
-        .setStrokeStyle(2, 0xffffff, 0.18);
+        .setStrokeStyle(3, 0xffffff, 0.85);
 
       const txt = this.add.text(0, 0, label, {
         fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
