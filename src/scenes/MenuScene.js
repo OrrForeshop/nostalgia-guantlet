@@ -49,8 +49,13 @@ export default class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     const start = () => {
-      const lm = this.registry.get('levelManager');
-      lm.startLevel(1);
+      console.log('Start button clicked');
+      const lm = this.game.registry.get('levelManager');
+      if (lm) {
+        lm.startLevel(1);
+      } else {
+        console.error('LevelManager not found in registry');
+      }
     };
 
     btn.on('pointerover', () => btn.setFillStyle(0x24306a));
