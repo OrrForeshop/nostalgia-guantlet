@@ -6,7 +6,8 @@ export default class Level1 extends LevelBase {
 
     // Icy Tower tuning
     this.totalFloors = 20;
-    this.floorSpacing = 65;
+    // Absolute Ease mode: keep floors very close together.
+    this.floorSpacing = 75;
 
     this.lastFloor = 0;
     this.failGuard = false;
@@ -58,16 +59,16 @@ export default class Level1 extends LevelBase {
       const s1 = minScale + ((a % 10) / 10) * (maxScale - minScale);
       const s2 = minScale + ((b % 10) / 10) * (maxScale - minScale);
 
-      platforms.create(x1, y, 'tex_platform').setScale(s1, 1).refreshBody();
+      platforms.create(x1, y, 'tex_platform').setScale(2.5, 1).refreshBody();
 
       // Add a second platform on most floors (makes the climb feel more "Icy Tower")
       if (floor % 2 === 0 || floor % 5 === 0) {
-        platforms.create(x2, y - 60, 'tex_platform').setScale(s2, 1).refreshBody();
+        platforms.create(x2, y - 60, 'tex_platform').setScale(2.5, 1).refreshBody();
       }
 
       // A small "bridge" every 4 floors to reduce difficulty spikes
       if (floor % 4 === 0) {
-        platforms.create(w / 2, y - 120, 'tex_platform').setScale(1.9, 1).refreshBody();
+        platforms.create(w / 2, y - 120, 'tex_platform').setScale(2.5, 1).refreshBody();
       }
     }
 
@@ -137,7 +138,8 @@ export default class Level1 extends LevelBase {
     const onGround = this.player.body.blocked.down;
 
     if (jump && onGround) {
-      this.player.setVelocityY(-950);
+      // Absolute Ease: massive jump boost.
+      this.player.setVelocityY(-900);
     }
 
     // Parallax brick background

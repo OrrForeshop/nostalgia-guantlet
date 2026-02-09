@@ -39,7 +39,7 @@ export default class MenuScene extends Phaser.Scene {
 
     const btn = this.add.rectangle(w / 2, 410, 260, 54, 0x1b2450)
       .setStrokeStyle(2, 0x2f3c7a)
-      .setInteractive({ useHandCursor: true });
+      .setInteractive({ useHandCursor: true, draggable: false });
 
     const btnText = this.add.text(w / 2, 410, 'START', {
       fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
@@ -48,28 +48,39 @@ export default class MenuScene extends Phaser.Scene {
       letterSpacing: 2,
     }).setOrigin(0.5);
 
+    let started = false;
     const start = () => {
+      if (started) return;
+      started = true;
       console.log('Start button clicked');
-      // Final attempt: try the most direct method possible.
+      
+      // Directly start Level1 scene and launch HUD
       this.scene.stop('Menu');
       this.scene.start('Level1', { levelNumber: 1 });
+      this.scene.launch('HUD');
       
       const lm = this.game.registry.get('levelManager');
       if (lm) {
         lm.setCurrent(1);
-        if (!this.game.scene.isActive('HUD')) {
-          this.game.scene.launch('HUD');
-        }
       }
     };
 
     btn.on('pointerover', () => btn.setFillStyle(0x24306a));
     btn.on('pointerout', () => btn.setFillStyle(0x1b2450));
     btn.on('pointerdown', start);
+    btn.on('pointerup', start);  // Also trigger on pointerup for better touch support
 
     this.input.keyboard.once('keydown-SPACE', start);
     this.input.keyboard.once('keydown-ENTER', start);
 
-    void btnText;
+    // Make text also interactive for easier touch
+    btnText.setInteractive({ useHandCursor: true });
+    btnText.on('pointerdown', start);
+    btnText.on('pointerup', start);
+
+    // Fallback: tap anywhere to start (after slight delay so loading doesn't trigger)
+    this.time.delayedCall(500, () => {
+      this.input.once('pointerdown', start);
+    });
   }
 }
