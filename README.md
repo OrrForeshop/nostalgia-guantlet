@@ -34,3 +34,15 @@ Then open: http://localhost:8080
 2. Register it in `src/main.js` in `LEVEL_SCENES`.
 3. Update `assets/levels.json` objective/title.
 
+## GitHub deployment
+
+This folder is initialized as a git repo. To publish to GitHub:
+
+```bash
+git branch -m main
+git remote add origin git@github.com:OrrForeshop/nostalgia-gauntlet.git
+git push -u origin main
+```
+
+(Repo creation on GitHub may require doing it in the web UI if no credentials are configured here.)
+
