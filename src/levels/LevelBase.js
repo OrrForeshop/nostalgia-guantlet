@@ -41,8 +41,8 @@ export default class LevelBase extends Phaser.Scene {
     });
 
     this.keys.r.on('down', () => {
-      const lm = this.registry.get('levelManager');
-      lm.restartLevel();
+      const lm = this.game.registry.get('levelManager');
+      if (lm) lm.restartLevel();
     });
 
     this.keys.esc.on('down', () => {
@@ -99,12 +99,18 @@ export default class LevelBase extends Phaser.Scene {
   }
 
   winLevel() {
-    const lm = this.registry.get('levelManager');
-    this.time.delayedCall(450, () => lm.nextLevel());
+    const lm = this.game.registry.get('levelManager');
+    this.time.delayedCall(450, () => {
+      if (lm) lm.nextLevel();
+      else this.scene.start('Menu');
+    });
   }
 
   failLevel() {
-    const lm = this.registry.get('levelManager');
-    this.time.delayedCall(200, () => lm.restartLevel());
+    const lm = this.game.registry.get('levelManager');
+    this.time.delayedCall(200, () => {
+      if (lm) lm.restartLevel();
+      else this.scene.restart();
+    });
   }
 }
