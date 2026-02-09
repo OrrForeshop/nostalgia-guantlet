@@ -54,7 +54,8 @@ export default class MenuScene extends Phaser.Scene {
       if (lm) {
         lm.startLevel(1);
       } else {
-        console.error('LevelManager not found in registry');
+        // Fallback: try starting the scene directly if manager is missing
+        this.scene.start('Level1', { levelNumber: 1 });
       }
     };
 

@@ -23,7 +23,7 @@ const config = {
     },
   },
   pixelArt: true,
-  scene: [BootScene, PreloadScene, MenuScene, HUDScene],
+  scene: [BootScene, PreloadScene, MenuScene, HUDScene, Level1],
 };
 
 const game = new Phaser.Game(config);
