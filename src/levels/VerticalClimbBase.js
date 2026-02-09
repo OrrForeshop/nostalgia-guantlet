@@ -5,7 +5,8 @@ export default class VerticalClimbBase extends LevelBase {
     super(key);
     this.targetFloors = targetFloors;
 
-    this.floorSpacing = 65; // Even lower platforms (almost half of original)
+    // Absolute Ease: keep floors close together, but not more than 75px apart.
+    this.floorSpacing = 75;
     this.deathMargin = 28;
 
     this.highestY = null;
@@ -49,7 +50,8 @@ export default class VerticalClimbBase extends LevelBase {
       }
       prevX = x;
 
-      const scaleX = Phaser.Math.FloatBetween(1.4, 2.3);
+      // Absolute Ease: wide platforms.
+      const scaleX = 2.5;
       this.platforms.create(x, y, 'tex_platform').setScale(scaleX, 1).refreshBody();
     }
 
@@ -100,7 +102,8 @@ export default class VerticalClimbBase extends LevelBase {
 
     const onGround = this.player.body.blocked.down;
     if (jump && onGround) {
-      this.player.setVelocityY(-760);
+      // Absolute Ease: massive jump boost.
+      this.player.setVelocityY(-900);
     }
 
     // Track highest point for floors.

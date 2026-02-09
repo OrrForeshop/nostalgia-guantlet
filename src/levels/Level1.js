@@ -59,17 +59,26 @@ export default class Level1 extends LevelBase {
       const s1 = minScale + ((a % 10) / 10) * (maxScale - minScale);
       const s2 = minScale + ((b % 10) / 10) * (maxScale - minScale);
 
-      platforms.create(x1, y, 'tex_platform').setScale(2.5, 1).refreshBody();
+      // Absolute Ease: wide platforms + final platform centered for a clean finish.
+      const mainX = floor === this.totalFloors ? w / 2 : x1;
+      platforms.create(mainX, y, 'tex_platform').setScale(2.5, 1).refreshBody();
 
-      // Add a second platform on most floors (makes the climb feel more "Icy Tower")
-      if (floor % 2 === 0 || floor % 5 === 0) {
+      if (floor === this.totalFloors) {
+        this._lastPlatformPos = { x: mainX, y };
+      }
+
+      // Add a second platform on most floors (but keep the final floor clean).
+      if (floor !== this.totalFloors && (floor % 2 === 0 || floor % 5 === 0)) {
         platforms.create(x2, y - 60, 'tex_platform').setScale(2.5, 1).refreshBody();
       }
 
-      // A small "bridge" every 4 floors to reduce difficulty spikes
-      if (floor % 4 === 0) {
+      // A small "bridge" every 4 floors.
+      if (floor !== this.totalFloors && floor % 4 === 0) {
         platforms.create(w / 2, y - 120, 'tex_platform').setScale(2.5, 1).refreshBody();
       }
+
+      void s1;
+      void s2;
     }
 
     // Player
@@ -82,9 +91,10 @@ export default class Level1 extends LevelBase {
 
     this.physics.add.collider(this.player, platforms);
 
-    // Goal: flag at the top of the tower (above floor 20)
-    const goalY = worldHeight - 80 - this.totalFloors * this.floorSpacing - 160;
-    this.goal = this.physics.add.staticImage(w / 2, goalY, 'tex_goal');
+    // Goal: place the flag clearly on the very last platform.
+    const lp = this._lastPlatformPos ?? { x: w / 2, y: worldHeight - 200 };
+    const goalY = lp.y - 64;
+    this.goal = this.physics.add.staticImage(lp.x, goalY, 'tex_goal');
     this.goal.refreshBody();
 
     this.physics.add.overlap(this.player, this.goal, () => {
