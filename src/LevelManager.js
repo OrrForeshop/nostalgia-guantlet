@@ -8,13 +8,13 @@ export default class LevelManager {
    * @param {Phaser.Scene} scene A scene with access to cache/scene manager.
    */
   constructor(scene) {
-    this.scene = scene;
+    this.game = scene.game;
     this.levels = [];
     this.currentLevelNumber = 1;
   }
 
   loadFromCache() {
-    const data = this.scene.cache.json.get('levels');
+    const data = this.game.cache.json.get('levels');
     if (!data || !Array.isArray(data.levels)) {
       throw new Error('levels.json missing or invalid. Expected shape: { levels: [...] }');
     }
@@ -44,41 +44,44 @@ export default class LevelManager {
     this.setCurrent(levelNumber);
 
     const cfg = this.getLevelConfig(this.currentLevelNumber);
-    const LEVEL_SCENES = this.scene.game.registry.get('LEVEL_SCENES') || {};
+    const LEVEL_SCENES = this.game.registry.get('LEVEL_SCENES') || {};
     const LevelSceneClass = LEVEL_SCENES[this.currentLevelNumber];
 
     // If a level scene class doesn't exist yet, fall back to Level1 for dev.
     const sceneKey = `Level${this.currentLevelNumber}`;
 
-    if (!this.scene.scene.get(sceneKey)) {
+    if (!this.game.scene.getScene(sceneKey)) {
       if (LevelSceneClass) {
-        this.scene.scene.add(sceneKey, LevelSceneClass, false);
+        this.game.scene.add(sceneKey, LevelSceneClass, false);
       } else {
         // Developer-friendly fallback.
-        this.scene.scene.add(sceneKey, LEVEL_SCENES[1], false);
+        this.game.scene.add(sceneKey, LEVEL_SCENES[1], false);
       }
     }
 
     // Ensure HUD is running.
-    if (!this.scene.scene.isActive('HUD')) {
-      this.scene.scene.launch('HUD');
+    if (!this.game.scene.isActive('HUD')) {
+      this.game.scene.launch('HUD');
     }
 
+    // Stop Menu scene
+    this.game.scene.stop('Menu');
+
     // Stop any other active level scenes.
-    this.scene.scene.getScenes(true).forEach(s => {
+    this.game.scene.getScenes(true).forEach(s => {
       if (s.scene.key.startsWith('Level') && s.scene.key !== sceneKey) {
-        this.scene.scene.stop(s.scene.key);
-        this.scene.scene.remove(s.scene.key);
+        this.game.scene.stop(s.scene.key);
+        this.game.scene.remove(s.scene.key);
       }
     });
 
-    this.scene.scene.start(sceneKey, {
+    this.game.scene.start(sceneKey, {
       levelNumber: this.currentLevelNumber,
       levelConfig: cfg,
     });
 
     // Tell HUD what to display.
-    this.scene.events.emit('level:changed', {
+    this.game.events.emit('level:changed', {
       levelNumber: this.currentLevelNumber,
       objective: cfg.objective || 'Reach the goal.',
       totalLevels: this.totalLevels,

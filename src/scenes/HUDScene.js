@@ -35,9 +35,8 @@ export default class HUDScene extends Phaser.Scene {
 
     this.container.add([bg, this.txtLevel, this.txtTime, this.txtObjective]);
 
-    // Event bridge from LevelManager / Levels
-    const preload = this.scene.get('Preload');
-    preload?.events.on('level:changed', (data) => {
+    // Event bridge from LevelManager / Levels (using game-level events)
+    this.game.events.on('level:changed', (data) => {
       this.levelNumber = data.levelNumber;
       this.totalLevels = data.totalLevels;
       this.objective = data.objective;
@@ -45,9 +44,9 @@ export default class HUDScene extends Phaser.Scene {
       this.resetTimer();
     });
 
-    preload?.events.on('timer:reset', () => this.resetTimer());
-    preload?.events.on('timer:pause', () => this.setPaused(true));
-    preload?.events.on('timer:resume', () => this.setPaused(false));
+    this.game.events.on('timer:reset', () => this.resetTimer());
+    this.game.events.on('timer:pause', () => this.setPaused(true));
+    this.game.events.on('timer:resume', () => this.setPaused(false));
 
     this.isPaused = false;
     this.refresh();

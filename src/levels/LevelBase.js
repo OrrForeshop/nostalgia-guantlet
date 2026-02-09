@@ -24,8 +24,7 @@ export default class LevelBase extends Phaser.Scene {
     this.createPauseOverlay();
 
     // Keep HUD timer in sync on new level start.
-    const preload = this.scene.get('Preload');
-    preload?.events.emit('timer:reset');
+    this.game.events.emit('timer:reset');
   }
 
   setupInput() {
@@ -80,13 +79,11 @@ export default class LevelBase extends Phaser.Scene {
     if (this.isPaused) {
       this.physics.world.pause();
       this.pauseOverlay.setVisible(true);
-      const preload = this.scene.get('Preload');
-      preload?.events.emit('timer:pause');
+      this.game.events.emit('timer:pause');
     } else {
       this.physics.world.resume();
       this.pauseOverlay.setVisible(false);
-      const preload = this.scene.get('Preload');
-      preload?.events.emit('timer:resume');
+      this.game.events.emit('timer:resume');
     }
   }
 
