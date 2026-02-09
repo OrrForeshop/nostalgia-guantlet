@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nostalgia Gauntlet</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #0b1020; }
+    body { display: grid; place-items: center; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    #game { width: min(960px, 100vw); height: min(540px, 100vh); }
+    canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+    .noscript { color: #c9d1ff; padding: 12px; max-width: 720px; }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <noscript><div class="noscript">This game requires JavaScript.</div></noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
