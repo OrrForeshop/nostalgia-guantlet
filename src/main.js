@@ -3,10 +3,18 @@ import PreloadScene from './scenes/PreloadScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import HUDScene from './scenes/HUDScene.js';
 import Level1 from './levels/Level1.js';
+import Level2 from './levels/Level2.js';
+import Level3 from './levels/Level3.js';
+import Level4 from './levels/Level4.js';
+import Level5 from './levels/Level5.js';
 
 // Register future levels here (2..50 can be added later).
 const LEVEL_SCENES = {
   1: Level1,
+  2: Level2,
+  3: Level3,
+  4: Level4,
+  5: Level5,
 };
 
 const config = {
