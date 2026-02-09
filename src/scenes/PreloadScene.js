@@ -77,13 +77,72 @@ export default class PreloadScene extends Phaser.Scene {
     
     g.generateTexture('tex_player', 26, 40);
 
-    // PLATFORM
+    // PLATFORM (ice/snow block)
     g.clear();
-    g.fillStyle(0x2b3a73, 1);
+    // Base ice
+    g.fillStyle(0xbfe9ff, 1);
     g.fillRect(0, 0, 64, 16);
-    g.lineStyle(2, 0x141c3f, 1);
+
+    // Snow cap
+    g.fillStyle(0xf5fbff, 1);
+    g.fillRect(0, 0, 64, 5);
+
+    // Ice facets
+    g.lineStyle(1, 0x86c9f2, 0.9);
+    g.lineBetween(6, 6, 22, 14);
+    g.lineBetween(24, 6, 40, 14);
+    g.lineBetween(42, 6, 58, 14);
+
+    // Shading
+    g.fillStyle(0x8fd3ff, 0.35);
+    g.fillTriangle(0, 16, 0, 8, 10, 16);
+    g.fillTriangle(64, 16, 54, 16, 64, 8);
+
+    // Outline
+    g.lineStyle(2, 0x3f6f8f, 1);
     g.strokeRect(0, 0, 64, 16);
+
     g.generateTexture('tex_platform', 64, 16);
+
+    // BACKGROUND: stone brick tile
+    g.clear();
+    g.fillStyle(0x1b2130, 1);
+    g.fillRect(0, 0, 128, 128);
+
+    // bricks
+    const brickFill = 0x2a3247;
+    const mortar = 0x111624;
+    g.lineStyle(2, mortar, 1);
+    for (let row = 0; row < 8; row++) {
+      const y = row * 16;
+      const offset = (row % 2) * 16;
+      for (let col = 0; col < 8; col++) {
+        const x = col * 32 - offset;
+        g.fillStyle(brickFill + (row % 3) * 0x040404, 1);
+        g.fillRect(Phaser.Math.Wrap(x, -32, 128), y, 32, 16);
+        g.strokeRect(Phaser.Math.Wrap(x, -32, 128), y, 32, 16);
+      }
+    }
+    // subtle highlights
+    g.fillStyle(0xffffff, 0.03);
+    g.fillRect(0, 0, 128, 128);
+    g.generateTexture('tex_bg_brick', 128, 128);
+
+    // HUD ICON: stopwatch
+    g.clear();
+    g.fillStyle(0x0b1020, 0);
+    g.fillRect(0, 0, 20, 20);
+    g.fillStyle(0x1b2450, 1);
+    g.fillCircle(10, 11, 8);
+    g.lineStyle(2, 0xe6ebff, 1);
+    g.strokeCircle(10, 11, 8);
+    g.lineStyle(2, 0xe6ebff, 1);
+    g.lineBetween(10, 11, 10, 6);
+    g.lineBetween(10, 11, 14, 12);
+    // knob
+    g.fillStyle(0xe6ebff, 1);
+    g.fillRect(8, 1, 4, 3);
+    g.generateTexture('tex_icon_timer', 20, 20);
 
     // HAZARD: small spinning "saw" circle
     g.clear();

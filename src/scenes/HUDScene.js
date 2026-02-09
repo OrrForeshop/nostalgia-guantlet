@@ -15,25 +15,35 @@ export default class HUDScene extends Phaser.Scene {
     const bg = this.add.rectangle(0, 0, w, 52, 0x0b1020, 0.75).setOrigin(0, 0);
     bg.setStrokeStyle(2, 0x1b2450, 0.8);
 
-    this.txtLevel = this.add.text(16, 14, 'Level 1/50', {
+    // Left cluster (Icy Tower inspired): timer icon + time, then Floors.
+    this.iconTimer = this.add.image(18, 26, 'tex_icon_timer').setOrigin(0.5);
+    this.iconTimer.setScale(1.1);
+
+    this.txtTime = this.add.text(34, 16, '0.0s', {
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
       fontSize: '16px',
       color: '#e6ebff',
     });
 
-    this.txtTime = this.add.text(180, 14, 'Time 0.0s', {
+    this.txtFloors = this.add.text(120, 16, 'Floors 0', {
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
       fontSize: '16px',
       color: '#c9d1ff',
     });
 
-    this.txtObjective = this.add.text(340, 14, 'Objective: ...', {
+    this.txtLevel = this.add.text(240, 16, 'Level 1/50', {
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
       fontSize: '16px',
       color: '#a9b4ff',
     });
 
-    this.container.add([bg, this.txtLevel, this.txtTime, this.txtObjective]);
+    this.txtObjective = this.add.text(390, 16, 'Objective: ...', {
+      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+      fontSize: '16px',
+      color: '#a9b4ff',
+    });
+
+    this.container.add([bg, this.iconTimer, this.txtTime, this.txtFloors, this.txtLevel, this.txtObjective]);
 
     // Event bridge from LevelManager / Levels (using game-level events)
     this.game.events.on('level:changed', (data) => {
@@ -42,6 +52,11 @@ export default class HUDScene extends Phaser.Scene {
       this.objective = data.objective;
       this.refresh();
       this.resetTimer();
+    });
+
+    this.game.events.on('floors:changed', (data) => {
+      const floors = data?.floors ?? 0;
+      this.txtFloors.setText(`Floors ${floors}`);
     });
 
     this.game.events.on('timer:reset', () => this.resetTimer());
@@ -93,12 +108,12 @@ export default class HUDScene extends Phaser.Scene {
   refresh() {
     this.txtLevel.setText(`Level ${this.levelNumber}/${this.totalLevels}`);
     this.txtObjective.setText(`Objective: ${this.objective || 'Reach the goal.'}`);
-    this.txtTime.setText(`Time ${(this.elapsedMs / 1000).toFixed(1)}s`);
+    this.txtTime.setText(`${(this.elapsedMs / 1000).toFixed(1)}s`);
   }
 
   update(_t, dt) {
     if (this.isPaused) return;
     this.elapsedMs += dt;
-    this.txtTime.setText(`Time ${(this.elapsedMs / 1000).toFixed(1)}s`);
+    this.txtTime.setText(`${(this.elapsedMs / 1000).toFixed(1)}s`);
   }
 }
