@@ -93,6 +93,10 @@ export default class LevelManager {
   }
 
   nextLevel() {
+    if (this.currentLevelNumber >= this.totalLevels) {
+      this.game.events.emit('game:end');
+      return;
+    }
     const next = Math.min(this.currentLevelNumber + 1, this.totalLevels);
     this.startLevel(next);
   }

@@ -47,9 +47,38 @@ export default class HUDScene extends Phaser.Scene {
     this.game.events.on('timer:reset', () => this.resetTimer());
     this.game.events.on('timer:pause', () => this.setPaused(true));
     this.game.events.on('timer:resume', () => this.setPaused(false));
+    
+    // Listen for game end to show a replay button
+    this.game.events.on('game:end', () => {
+      this.showPlayAgain();
+    });
 
     this.isPaused = false;
     this.refresh();
+  }
+
+  showPlayAgain() {
+    const w = this.scale.width;
+    const h = this.scale.height;
+    
+    const overlay = this.add.container(0, 0).setDepth(2000);
+    const bg = this.add.rectangle(0, 0, w, h, 0x000000, 0.7).setOrigin(0);
+    
+    const btn = this.add.rectangle(w / 2, h / 2, 240, 60, 0x1b2450)
+      .setStrokeStyle(2, 0x2f3c7a)
+      .setInteractive({ useHandCursor: true });
+      
+    this.add.text(w / 2, h / 2, 'PLAY AGAIN', {
+      fontSize: '24px',
+      fontWeight: 'bold',
+      color: '#ffffff'
+    }).setOrigin(0.5);
+    
+    btn.on('pointerdown', () => {
+      this.game.events.off('game:end');
+      this.scene.stop('HUD');
+      this.game.registry.get('levelManager').startLevel(1);
+    });
   }
 
   resetTimer() {
