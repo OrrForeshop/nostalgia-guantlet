@@ -39,13 +39,43 @@ export default class PreloadScene extends Phaser.Scene {
     // Player texture
     const g = this.add.graphics();
 
-    // PLAYER: rounded rect
+    // PLAYER: Little guy with blue bucket hat, green sweater, brown pants
     g.clear();
-    g.fillStyle(0x76b7ff, 1);
-    g.fillRoundedRect(0, 0, 24, 32, 6);
-    g.lineStyle(2, 0x1f3a7a, 1);
-    g.strokeRoundedRect(0, 0, 24, 32, 6);
-    g.generateTexture('tex_player', 24, 32);
+    
+    // Brown pants (bottom)
+    g.fillStyle(0x5c4a32, 1);
+    g.fillRect(4, 28, 8, 12);  // left leg
+    g.fillRect(14, 28, 8, 12); // right leg
+    
+    // Green sweater (body)
+    g.fillStyle(0x2ecc71, 1);
+    g.fillRoundedRect(2, 14, 22, 16, 4);
+    
+    // Small crown on sweater
+    g.fillStyle(0xf1c40f, 1);
+    g.fillTriangle(10, 20, 13, 16, 16, 20);
+    
+    // Face/head (peach color)
+    g.fillStyle(0xffccaa, 1);
+    g.fillCircle(13, 10, 8);
+    
+    // Blue bucket hat
+    g.fillStyle(0x3498db, 1);
+    g.fillRect(3, 2, 20, 8);
+    g.fillRect(1, 8, 24, 4);
+    
+    // Hat outline
+    g.lineStyle(2, 0x1a5276, 1);
+    g.strokeRect(3, 2, 20, 8);
+    g.strokeRect(1, 8, 24, 4);
+    
+    // Smile
+    g.lineStyle(1, 0x333333, 1);
+    g.beginPath();
+    g.arc(13, 11, 4, 0.2, Math.PI - 0.2);
+    g.strokePath();
+    
+    g.generateTexture('tex_player', 26, 40);
 
     // PLATFORM
     g.clear();

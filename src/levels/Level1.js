@@ -21,10 +21,11 @@ export default class Level1 extends LevelBase {
       platforms.create(x + 32, h - 24, 'tex_platform');
     }
 
-    // Floating ledges
-    platforms.create(240, 380, 'tex_platform').setScale(1.5, 1).refreshBody();
-    platforms.create(520, 300, 'tex_platform').setScale(1.2, 1).refreshBody();
-    platforms.create(760, 220, 'tex_platform').setScale(1.4, 1).refreshBody();
+    // Floating ledges (closer together and lower for easier jumping)
+    platforms.create(200, 420, 'tex_platform').setScale(1.8, 1).refreshBody();
+    platforms.create(380, 380, 'tex_platform').setScale(1.6, 1).refreshBody();
+    platforms.create(560, 340, 'tex_platform').setScale(1.6, 1).refreshBody();
+    platforms.create(740, 300, 'tex_platform').setScale(1.8, 1).refreshBody();
 
     // Player
     this.player = this.physics.add.sprite(90, h - 100, 'tex_player');
@@ -62,8 +63,8 @@ export default class Level1 extends LevelBase {
       this.failLevel();
     });
 
-    // Goal: flag
-    this.goal = this.physics.add.staticImage(w - 110, 170, 'tex_goal');
+    // Goal: flag (placed on the last platform)
+    this.goal = this.physics.add.staticImage(w - 100, 260, 'tex_goal');
     this.goal.refreshBody();
 
     this.physics.add.overlap(this.player, this.goal, () => {
@@ -77,7 +78,7 @@ export default class Level1 extends LevelBase {
     this.cameras.main.setDeadzone(120, 80);
 
     // Win text hint (subtle)
-    this.add.text(720, 120, 'FLAG →', {
+    this.add.text(720, 220, 'FLAG →', {
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
       fontSize: '16px',
       color: '#a9b4ff',
@@ -106,7 +107,7 @@ export default class Level1 extends LevelBase {
     const onGround = this.player.body.blocked.down;
 
     if (jump && onGround) {
-      this.player.setVelocityY(-520);
+      this.player.setVelocityY(-620);
     }
   }
 }
