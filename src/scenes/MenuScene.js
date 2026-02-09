@@ -50,12 +50,16 @@ export default class MenuScene extends Phaser.Scene {
 
     const start = () => {
       console.log('Start button clicked');
+      // Final attempt: try the most direct method possible.
+      this.scene.stop('Menu');
+      this.scene.start('Level1', { levelNumber: 1 });
+      
       const lm = this.game.registry.get('levelManager');
       if (lm) {
-        lm.startLevel(1);
-      } else {
-        // Fallback: try starting the scene directly if manager is missing
-        this.scene.start('Level1', { levelNumber: 1 });
+        lm.setCurrent(1);
+        if (!this.game.scene.isActive('HUD')) {
+          this.game.scene.launch('HUD');
+        }
       }
     };
 
