@@ -18,19 +18,20 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Capacitor CLI and dependencies
-        run: |
-          npm install -g @capacitor/cli
-          npm init -y
-          npm install @capacitor/core @capacitor/android
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Init Capacitor
+      - name: Install Capacitor + create package.json
+        run: |
+          npm install @capacitor/cli @capacitor/core @capacitor/android
+
+      - name: Write capacitor config
         run: |
           cat > capacitor.config.json << 'EOF'
           {
@@ -39,9 +40,6 @@ jobs:
             "webDir": ".",
             "server": {
               "androidScheme": "https"
-            },
-            "android": {
-              "allowMixedContent": true
             }
           }
           EOF
@@ -49,21 +47,16 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Copy web assets to Android
+      - name: Copy web assets
         run: npx cap copy android
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
 
       - name: Build debug APK
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon 2>&1
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: RetroRush-debug
