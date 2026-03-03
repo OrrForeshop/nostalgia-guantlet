@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Nostalgia Gauntlet</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #0b1020;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      /* iOS safe area (notch / home bar) */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      /* Ensure full height includes safe areas */
+      min-height: -webkit-fill-available;
+      min-height: 100dvh;
+    }
+
+    /* ── Game canvas area: top 3/4 ─────────────────────── */
+    #game {
+      flex: 3;           /* 3 parts out of 4 total  */
+      width: 100%;
+      min-height: 0;     /* allow flex shrink        */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #game canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      -webkit-image-rendering: pixelated; /* Safari */
+      max-width: 100%;
+      max-height: 100%;
+      touch-action: none;
+      margin: 0 auto !important;
+      /* Prevent iOS callout on long-press */
+      -webkit-touch-callout: none;
+    }
+
+    /* ── Controls panel: bottom 1/4 ────────────────────── */
+    #controls {
+      flex: 1;           /* 1 part out of 4 total   */
+      width: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: #080e1c;
+      border-top: 2px solid #1b2450;
+      gap: 12px;
+    }
+
+    .ctrl-btn {
+      flex: 1;
+      height: 80%;
+      max-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: rgba(0, 0, 0, 0.55);
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      border-radius: 14px;
+      color: #ffffff;
+      font-size: 36px;
+      font-weight: 800;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      cursor: pointer;
+
+      /* Prevent native long-press / selection UI */
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+
+      /* Active state feedback */
+      transition: background 0.05s;
+    }
+
+    .ctrl-btn:active,
+    .ctrl-btn.pressed {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    #btn-jump {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .noscript { color: #c9d1ff; padding: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- ── 3/4: Phaser canvas lives here ───────────────── -->
+  <div id="game"></div>
+
+  <!-- ── 1/4: Native HTML controls ──────────────────── -->
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-left"  aria-label="Move left">◀</button>
+    <button class="ctrl-btn" id="btn-right" aria-label="Move right">▶</button>
+    <button class="ctrl-btn" id="btn-jump"  aria-label="Jump">JUMP</button>
+  </div>
+
+  <noscript><div class="noscript">JavaScript is required.</div></noscript>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <script type="module" src="./src/main.js"></script>
+
+  <script>
+    // ── Bridge: HTML buttons → Phaser registry ─────────────────────────────
+    // Phaser exposes window.__phaserGame after boot (set in main.js).
+    // LevelBase.getMoveInput() reads touchInput every frame.
+
+    // ── Mobile hardening ──────────────────────────────────────────────────
+    // Prevent context menu on long-press (Android/iOS)
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, { passive: false });
+    // Prevent iOS rubber-band / overscroll on the whole page
+    document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+    // Prevent double-tap zoom on iOS
+    var lastTap = 0;
+    document.addEventListener('touchend', function(e) {
+      var now = Date.now();
+      if (now - lastTap < 300) e.preventDefault();
+      lastTap = now;
+    }, { passive: false });
+
+    window._getTouch = function _getTouch() {
+      var g = window.__phaserGame;
+      if (!g) return null;
+      var t = g.registry.get('touchInput');
+      if (!t) { t = { left: false, right: false, up: false, down: false, jump: false, jumpJustPressed: false }; }
+      // Ensure all keys always exist
+      if (t.up   === undefined) t.up   = false;
+      if (t.down === undefined) t.down = false;
+      return t;
+    }
+
+    window._commit = function _commit(t) {
+      var g = window.__phaserGame;
+      if (g) g.registry.set('touchInput', t);
+    }
+
+    // Called by HUDScene on level restart — clears ALL movement keys
+    window.__resetMoveButton = function () {
+      var t = _getTouch();
+      if (t) { t.left = false; t.right = false; t.up = false; t.down = false; t.jump = false; t.jumpJustPressed = false; _commit(t); }
+    };
+
+    // ── LEFT button (hold) ────────────────────────────────────────────────
+    function bindHold(id, key) {
+      var el = document.getElementById(id);
+      function down(e) {
+        e.preventDefault();
+        var t = _getTouch();
+        if (!t) return;
+        // Clear opposite direction so only one direction is active at a time
+        t.left  = (key === 'left');
+        t.right = (key === 'right');
+        _commit(t);
+      }
+      function up(e) {
+        e.preventDefault();
+        var t = _getTouch();
+        if (!t) return;
+        t[key] = false;
+        _commit(t);
+      }
+      el.addEventListener('touchstart',  down, { passive: false });
+      el.addEventListener('touchend',    up,   { passive: false });
+      el.addEventListener('touchcancel', up,   { passive: false });
+      el.addEventListener('mousedown',   down, { passive: false });
+      el.addEventListener('mouseup',     up,   { passive: false });
+      el.addEventListener('mouseleave',  up,   { passive: false });
+    }
+
+    bindHold('btn-left',  'left');
+    bindHold('btn-right', 'right');
+
+    // ── JUMP button (hold) ────────────────────────────────────────────────
+    var btnJump = document.getElementById('btn-jump');
+
+    function onJumpDown(e) {
+      e.preventDefault();
+      var t = _getTouch();
+      if (!t) return;
+      if (!t.jump) t.jumpJustPressed = true;
+      t.jump = true;
+      _commit(t);
+    }
+    function onJumpUp(e) {
+      e.preventDefault();
+      var t = _getTouch();
+      if (!t) return;
+      t.jump = false;
+      _commit(t);
+    }
+
+    btnJump.addEventListener('touchstart',  onJumpDown, { passive: false });
+    btnJump.addEventListener('touchend',    onJumpUp,   { passive: false });
+    btnJump.addEventListener('touchcancel', onJumpUp,   { passive: false });
+    btnJump.addEventListener('mousedown',   onJumpDown, { passive: false });
+    btnJump.addEventListener('mouseup',     onJumpUp,   { passive: false });
+    btnJump.addEventListener('mouseleave',  onJumpUp,   { passive: false });
+  </script>
+
+</body>
+</html>
