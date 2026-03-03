@@ -1,0 +1,71 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Capacitor CLI and dependencies
+        run: |
+          npm install -g @capacitor/cli
+          npm init -y
+          npm install @capacitor/core @capacitor/android
+
+      - name: Init Capacitor
+        run: |
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.retrorush.nostalgiagauntlet",
+            "appName": "RetroRush",
+            "webDir": ".",
+            "server": {
+              "androidScheme": "https"
+            },
+            "android": {
+              "allowMixedContent": true
+            }
+          }
+          EOF
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Copy web assets to Android
+        run: npx cap copy android
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RetroRush-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
