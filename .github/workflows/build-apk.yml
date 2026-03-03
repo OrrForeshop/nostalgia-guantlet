@@ -27,9 +27,14 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Capacitor + create package.json
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Prepare web assets in www/
         run: |
-          npm install @capacitor/cli @capacitor/core @capacitor/android
+          mkdir -p www
+          # Copy all game files into www/ (exclude node_modules, android, .github)
+          rsync -a --exclude='www' --exclude='node_modules' --exclude='android' --exclude='.github' --exclude='.git' . www/
 
       - name: Write capacitor config
         run: |
@@ -37,12 +42,15 @@ jobs:
           {
             "appId": "com.retrorush.nostalgiagauntlet",
             "appName": "RetroRush",
-            "webDir": ".",
+            "webDir": "www",
             "server": {
               "androidScheme": "https"
             }
           }
           EOF
+
+      - name: Create capacitor plugins file
+        run: echo '[]' > capacitor.plugins.json
 
       - name: Add Android platform
         run: npx cap add android
@@ -54,7 +62,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon 2>&1
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
