@@ -1,0 +1,7 @@
+// Generated Cordova plugin build file
+repositories {
+    flatDir {
+        dirs '../capacitor-cordova-android-plugins/src/main'
+    }
+}
+configurations.maybeCreate("default")
