@@ -27,44 +27,43 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Capacitor
+      - name: Install Capacitor dependencies
         run: npm install
 
-      - name: Prepare web assets in www/
+      - name: Prepare www/ folder with game files
         run: |
           mkdir -p www
-          # Copy all game files into www/ (exclude node_modules, android, .github)
-          rsync -a --exclude='www' --exclude='node_modules' --exclude='android' --exclude='.github' --exclude='.git' . www/
+          rsync -a \
+            --exclude='www' \
+            --exclude='node_modules' \
+            --exclude='android' \
+            --exclude='.github' \
+            --exclude='.git' \
+            . www/
 
-      - name: Write capacitor config
+      - name: Write Capacitor config
         run: |
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.retrorush.nostalgiagauntlet",
-            "appName": "RetroRush",
-            "webDir": "www",
-            "server": {
-              "androidScheme": "https"
-            }
-          }
-          EOF
-
-      - name: Create capacitor plugins file
-        run: echo '[]' > capacitor.plugins.json
+          printf '%s\n' '{' \
+            '  "appId": "com.retrorush.nostalgiagauntlet",' \
+            '  "appName": "RetroRush",' \
+            '  "webDir": "www",' \
+            '  "server": { "androidScheme": "https" }' \
+            '}' > capacitor.config.json
+          cat capacitor.config.json
 
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Copy web assets
+      - name: Copy web assets to Android
         run: npx cap copy android
 
       - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: RetroRush-debug
