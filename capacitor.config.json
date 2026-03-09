@@ -1,0 +1,8 @@
+{
+  "appId": "com.retrorush.nostalgiagauntlet",
+  "appName": "RetroRush",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
