@@ -25,14 +25,20 @@ jobs:
           distribution: 'temurin'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build web project
         run: npm run build
 
-      # android/ is committed to the repo — copy web assets only (no SDK needed)
+      - name: Verify www contents
+        run: |
+          echo "--- www/ contents ---"
+          ls -la www/
+          echo "--- index.html check ---"
+          ls www/index.html
+
       - name: Copy web assets to Android
-        run: npx cap copy android
+        run: ./node_modules/.bin/cap copy android
 
       - name: Accept Android licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
