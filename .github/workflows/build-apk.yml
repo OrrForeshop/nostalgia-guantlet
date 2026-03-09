@@ -30,30 +30,32 @@ jobs:
       - name: Build web project
         run: npm run build
 
-      - name: Verify www contents
-        run: |
-          echo "--- www/ contents ---"
-          ls -la www/
-          echo "--- index.html check ---"
-          ls www/index.html
-
       - name: Copy web assets to Android
         run: |
           mkdir -p android/app/src/main/assets/public
           cp -r www/* android/app/src/main/assets/public/
           cp capacitor.config.json android/app/src/main/assets/capacitor.config.json
           echo '{"pluginsFolderExists":false,"plugins":[]}' > android/app/src/main/assets/capacitor.plugins.json
-          echo "Assets copied:"
-          ls android/app/src/main/assets/public/ | head -5
 
-      - name: Accept Android licenses
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+      - name: Accept Android SDK licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Install required Android SDK components
+        run: |
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "platform-tools"
+
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
       - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
