@@ -24,59 +24,42 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Step 1: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 2: Build the web project (copies game files into www/)
       - name: Build web project
         run: npm run build
 
-      # Verify www/index.html exists before proceeding
       - name: Verify webDir exists
         run: |
-          if [ ! -f www/index.html ]; then
-            echo "ERROR: www/index.html not found, running build again"
-            npm run build
-          fi
-          echo "webDir contents:"
-          ls www/
+          ls www/index.html
+          echo "webDir OK"
 
-      # Step 3: Add Android platform (skip if already exists)
       - name: Add Android platform
         run: |
-          if [ -d "android" ]; then
-            echo "Android platform already exists, skipping."
-          else
+          if [ ! -d "android" ]; then
             npx cap add android
+          else
+            echo "Android platform already exists"
           fi
 
-      # Step 4: Sync the Capacitor project
       - name: Sync Capacitor project
         run: npx cap sync android
 
-      # Step 5: Verify android directory and build files
       - name: Verify android directory
         run: |
-          if [ ! -d "android" ]; then
-            echo "ERROR: android directory missing!"
-            exit 1
-          fi
-          echo "Android directory exists."
-          ls android/app/src/main/assets/public/ | head -10
+          ls android/app/src/main/assets/public/index.html
+          echo "Android assets OK"
 
-      # Accept Android SDK licenses
       - name: Accept Android licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      # Build the APK
       - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      # Upload APK as artifact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
