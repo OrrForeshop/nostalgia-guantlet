@@ -24,13 +24,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Confirm Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls $ANDROID_HOME/build-tools/ || true
+          ls $ANDROID_HOME/platforms/ || true
 
       - name: Install Capacitor dependencies
         run: npm install
 
-      - name: Prepare www/ folder with game files
+      - name: Prepare www/ with game files
         run: |
           mkdir -p www
           rsync -a \
@@ -43,25 +47,28 @@ jobs:
 
       - name: Write Capacitor config
         run: |
-          printf '%s\n' '{' \
-            '  "appId": "com.retrorush.nostalgiagauntlet",' \
-            '  "appName": "RetroRush",' \
-            '  "webDir": "www",' \
-            '  "server": { "androidScheme": "https" }' \
-            '}' > capacitor.config.json
+          cat > capacitor.config.json << 'CAPEOF'
+{"appId":"com.retrorush.nostalgiagauntlet","appName":"RetroRush","webDir":"www","server":{"androidScheme":"https"}}
+CAPEOF
           cat capacitor.config.json
 
       - name: Add Android platform
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         run: npx cap add android
 
       - name: Copy web assets to Android
         run: npx cap copy android
 
+      - name: Accept Android licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
       - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
