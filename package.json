@@ -7,8 +7,8 @@
     "build": "mkdir -p www && rsync -a --exclude='www' --exclude='node_modules' --exclude='android' --exclude='.github' --exclude='.git' --exclude='package.json' --exclude='package-lock.json' --exclude='capacitor.config.json' . www/"
   },
   "dependencies": {
-    "@capacitor/android": "^8.0.0",
-    "@capacitor/cli": "^8.0.0",
-    "@capacitor/core": "^8.0.0"
+    "@capacitor/android": "8.2.0",
+    "@capacitor/cli": "8.2.0",
+    "@capacitor/core": "8.2.0"
   }
 }

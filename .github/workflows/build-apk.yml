@@ -30,9 +30,9 @@ jobs:
       - name: Build web project
         run: npm run build
 
-      # android/ is committed to the repo — no need to run cap add android
-      - name: Sync Capacitor project
-        run: npx cap sync android
+      # android/ is committed to the repo — copy web assets only (no SDK needed)
+      - name: Copy web assets to Android
+        run: npx cap copy android
 
       - name: Accept Android licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
