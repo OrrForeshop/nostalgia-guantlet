@@ -1,0 +1,35 @@
+===== APP NAME =====
+RetroRush
+
+===== SHORT DESCRIPTION (80 chars max) =====
+10 retro micro-levels of pure 90s arcade action. Can you beat them all?
+
+===== FULL DESCRIPTION (Google Play) =====
+RetroRush is a love letter to the golden age of arcade games — 10 unique micro-levels packed with retro-style gameplay, each one a different challenge inspired by the classics of the 90s.
+
+🎮 LEVELS INCLUDE:
+• Climb towering floors on moving platforms — don't fall!
+• Pop bouncing orbs with your harpoon before time runs out
+• Pilot your ship through a deadly tunnel, Flappy Bird-style
+• Smash bricks with a paddle in classic breakout action
+• Pull falling items with your claw to reach $500
+• Survive a zombie arena with your joystick and blaster
+• Navigate a scrolling maze and reach the EXIT alive
+• Outrun a collapsing wall in a heart-pounding sprint
+• Dodge bullets in space and survive 20 seconds
+• Aim and launch projectiles to destroy every target
+
+⚡ FEATURES:
+• Mobile-first touch controls — joysticks, drag pads, and tap-to-play
+• 10 hand-crafted levels, each with a unique mechanic
+• Fast restarts — no waiting around
+• Retro pixel art style
+• Totally free, no ads, no in-app purchases
+
+🏆 Think you can clear all 10 levels?
+RetroRush is quick to pick up, tough to master. Perfect for short gaming sessions or marathon runs.
+
+More levels coming soon — we're building all the way to 50!
+
+===== KEYWORDS / TAGS =====
+retro, arcade, casual, platformer, mobile game, 90s, pixel art, mini games, levels, free game
