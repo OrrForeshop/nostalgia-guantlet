@@ -14,14 +14,14 @@ export default class MenuScene extends Phaser.Scene {
     if (controlsEl) controlsEl.style.visibility = 'hidden';
 
     // Title — centred vertically in the top third
-    this.add.text(w / 2, h * 0.14, 'Nostalgia Gauntlet', {
+    this.add.text(w / 2, h * 0.14, 'RetroRush', {
       fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
-      fontSize: '38px',
+      fontSize: '48px',
       fontStyle: 'bold',
       color: '#e6ebff',
     }).setOrigin(0.5);
 
-    this.add.text(w / 2, h * 0.22, '50 micro-levels. One retro marathon.', {
+    this.add.text(w / 2, h * 0.22, 'Classic Arcade Games from the 90s', {
       fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
       fontSize: '15px',
       color: '#a9b4ff',
