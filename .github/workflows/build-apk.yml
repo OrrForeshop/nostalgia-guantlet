@@ -55,23 +55,20 @@ jobs:
           base64 -d android/retrorush-release.b64 > android/retrorush-release.jks
           ls -la android/retrorush-release.jks
 
-      - name: Build signed release APK
+      - name: Build signed release AAB
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew bundleRelease --no-daemon
 
-      - name: Find APK
+      - name: Find AAB
         run: |
-          echo "=== Searching entire android/app/build for APKs ==="
-          find android/app/build -name "*.apk" 2>/dev/null || echo "No APKs found anywhere"
-          echo "=== build/outputs contents ==="
-          ls -laR android/app/build/outputs/ 2>/dev/null || echo "outputs dir missing"
+          find android/app/build -name "*.aab" 2>/dev/null || echo "No AAB found"
 
-      - name: Upload signed release APK
+      - name: Upload signed release AAB
         uses: actions/upload-artifact@v4
         with:
           name: RetroRush-release-signed
-          path: android/app/build/outputs/apk/release/*.apk
+          path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30
